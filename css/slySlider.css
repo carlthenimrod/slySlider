@@ -51,9 +51,10 @@
 }
 
 .sly-thumbs{
-	background-color: #333;	
+	background-color: #222;	
 	height: 60px;
 	overflow: hidden;
+	position: relative;
 	width: 100%;
 }
 
@@ -63,7 +64,7 @@
 	margin: 0;
 	padding: 0;
 	position: relative;
-	width: 1000px;
+	left: 0;
 }
 
 .sly-thumbs ul li{

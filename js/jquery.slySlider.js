@@ -159,8 +159,11 @@
 			ul.append(li);
 		}
 
-		//append list to module
-		$(module).append(ul);
+		//insert list to module
+		$(module).html(ul);
+
+		//set list's width
+		that.setListWidth(ul);
 	};
 
 	slySlider.prototype.events = function(){
@@ -171,6 +174,15 @@
 
 			//on thumb click
 			that.eventThumbClick(this);
+
+			//prevent default
+			e.preventDefault();
+		});
+
+		$(that.modules.thumbs).on('mousemove', function(e){
+
+			//on thumb mouse move
+			that.eventThumbMouseMove(this, e.pageX - $(this).offset().left);
 
 			//prevent default
 			e.preventDefault();
@@ -187,6 +199,41 @@
 		that.renderImage(that.modules.img, $(link).attr('href'));
 		that.renderText(that.modules.txt, $(link).attr('title'));
 	};
+
+	slySlider.prototype.eventThumbMouseMove = function(ctn, relX){
+
+		var that = this,
+			$ctn = $(ctn),
+			ul = $ctn.find('ul'),
+			ctnW, ulW, leftOver, marginRight, percent, move;
+
+		//store container width
+		ctnW = $ctn.width();
+
+		//store ul width
+		ulW = ul.width();
+
+		//find last margin right
+		marginRight = parseInt($(ul).find('li').last().css('margin-right'), 10);
+
+		//find left over space
+		leftOver = ulW - ctnW;
+
+		//if margin right, remove last margin off of left over
+		if(marginRight){
+
+			leftOver = leftOver - marginRight;
+		}
+
+		//find percent, limit to 3 decimal points
+		percent = (relX / ctnW).toFixed(3);
+
+		//find out how many pixels to move
+		move = (percent * leftOver).toFixed(3);
+
+		//move list
+		ul.css({ 'left' : '-' + move + 'px' });
+	};	
 
 	slySlider.prototype.createModules = function(){
 
@@ -250,6 +297,24 @@
 				return that.linkList[i];
 			}
 		}
+	};
+
+	slySlider.prototype.setListWidth = function(ul){
+
+		var i, l, 
+			$ul = $(ul),
+			li = $ul.find('li'),
+			w = 0;
+
+
+		//for each list item
+		for(i = 0, l = li.length; i < l; ++i){
+
+			//find and store outerWidth
+			w = w + $(li[i]).outerWidth(true);
+		}
+
+		$ul.css('width', w);
 	};
 
 	$.fn.slySlider = function(options){
