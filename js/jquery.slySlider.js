@@ -48,6 +48,9 @@
 
 		//render element
 		that.render();
+
+		//create events
+		that.events();	
 	};
 
 	slySlider.prototype.render = function(){
@@ -79,13 +82,13 @@
 						.append(that.modules.thumbs);
 	};
 
-	slySlider.prototype.renderImage = function(module, image){
+	slySlider.prototype.renderImage = function(module, src){
 
 		var that = this, img, imgSrc;
 
-		//if image is provided
-		if(image){
-
+		//if src is provided
+		if(src){
+			imgSrc = src;
 		}
 		else{
 
@@ -99,11 +102,11 @@
 		//set src attribute
 		img.setAttribute('src', imgSrc);
 
-		//onload, append img
+		//onload, insert img
 		img.onload = function(){
 
-			//append img
-			$(module).append(img);
+			//insert img
+			$(module).html(img);
 		};
 
 		//onerror, alert
@@ -113,21 +116,22 @@
 		};		
 	};
 
-	slySlider.prototype.renderText = function(module, text){
+	slySlider.prototype.renderText = function(module, title){
 
 		var that = this, link, title;
 
-		//find and store link
-		link = that.findLink(that.config.imgSrc);
+		//if no title
+		if(!title){
 
-		//store link's title
-		title = $(link).attr('title');
+			//find and store link
+			link = that.findLink(that.config.imgSrc);
 
-		//if title exists, append to module
-		if(title){
-			
-			$(module).append(title);
+			//store link's title
+			title = $(link).attr('title');
 		}
+
+		//insert title into module
+		$(module).html(title);
 	};
 
 	slySlider.prototype.renderControls = function(modPrev, modNext){
@@ -157,7 +161,32 @@
 
 		//append list to module
 		$(module).append(ul);
-	};				
+	};
+
+	slySlider.prototype.events = function(){
+
+		var that = this;
+
+		$(that.modules.thumbs).on('click', 'li a', function(e){
+
+			//on thumb click
+			that.eventThumbClick(this);
+
+			//prevent default
+			e.preventDefault();
+		});
+
+		$(that.modules.img).on('click', '');	
+	};
+
+	slySlider.prototype.eventThumbClick = function(link){
+
+		var that = this;
+
+		//render elements
+		that.renderImage(that.modules.img, $(link).attr('href'));
+		that.renderText(that.modules.txt, $(link).attr('title'));
+	};
 
 	slySlider.prototype.createModules = function(){
 
