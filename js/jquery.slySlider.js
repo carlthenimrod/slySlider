@@ -4,13 +4,17 @@
 	var defaults = {
 
 		classNames : {
+
+			active : 'sly-active',
 			ctn : 'sly-ctn',
-			img : 'sly-img',
-			txt : 'sly-txt',
 			ctrlPrev : 'sly-prev',
 			ctrlNext : 'sly-next',
-			thumbs : 'sly-thumbs'
+			img : 'sly-img',
+			thumbs : 'sly-thumbs',
+			txt : 'sly-txt'
 		},
+
+		imgSrc : false,
 
 		render : 'default'
 	};
@@ -28,8 +32,8 @@
 		//create modules
 		that.modules = that.createModules();
 
-		//store imageList
-		that.imageList = $(el).find('a');
+		//store linkList
+		that.linkList = $(el).find('a');
 
 		//initialize menu
 		that.init();
@@ -75,24 +79,84 @@
 						.append(that.modules.thumbs);
 	};
 
-	slySlider.prototype.renderImage = function(){
+	slySlider.prototype.renderImage = function(module, image){
+
+		var that = this, img, imgSrc;
+
+		//if image is provided
+		if(image){
+
+		}
+		else{
+
+			//get src for image, if imgSrc isn't set, get first img
+			imgSrc = (that.config.imgSrc) ? that.config.imgSrc : $(that.linkList[0]).attr('href');
+		}
+
+		//create img element
+		img = document.createElement('img');
+
+		//set src attribute
+		img.setAttribute('src', imgSrc);
+
+		//onload, append img
+		img.onload = function(){
+
+			//append img
+			$(module).append(img);
+		};
+
+		//onerror, alert
+		img.onerror = function(){
+
+			alert('Error: Failed to load image.');
+		};		
+	};
+
+	slySlider.prototype.renderText = function(module, text){
+
+		var that = this, link, title;
+
+		//find and store link
+		link = that.findLink(that.config.imgSrc);
+
+		//store link's title
+		title = $(link).attr('title');
+
+		//if title exists, append to module
+		if(title){
+			
+			$(module).append(title);
+		}
+	};
+
+	slySlider.prototype.renderControls = function(modPrev, modNext){
 
 		var that = this;
 	};
 
-	slySlider.prototype.renderText = function(){
+	slySlider.prototype.renderThumbs = function(module){
 
-		var that = this;
-	};
+		var that = this, i, l, ul, li;
 
-	slySlider.prototype.renderControls = function(){
+		//create unordered list element
+		ul = $('<ul>');
 
-		var that = this;
-	};
+		//for each element in linkList
+		for(i = 0, l = that.linkList.length; i < l; ++i){
 
-	slySlider.prototype.renderThumbs = function(){
+			//create list element
+			li = $('<li>');
 
-		var that = this;
+			//append element to list item
+			li.append(that.linkList[i]);
+
+			//append list element to ul
+			ul.append(li);
+		}
+
+		//append list to module
+		$(module).append(ul);
 	};				
 
 	slySlider.prototype.createModules = function(){
@@ -135,6 +199,28 @@
 
 		//return modules object
 		return modules;
+	};
+
+	slySlider.prototype.findLink = function(href){
+
+		var that = this, i, l;
+
+		//if href is false, find first link's href
+		if(!href){
+
+			href = $(that.linkList[0]).attr('href');
+		}
+
+		//for each element in linkList
+		for(i = 0, l = that.linkList.length; i < l; ++i){
+
+			//if href matches current links href
+			if(href === $(that.linkList[i]).attr('href')){
+
+				//return link
+				return that.linkList[i];
+			}
+		}
 	};
 
 	$.fn.slySlider = function(options){
