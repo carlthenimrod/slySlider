@@ -4,7 +4,7 @@
 }
 
 .sly-ctn{
-	background-color: #000;
+	background-color: #222;
 	padding: 10px;
 	position: relative;
 	width: 100%;
@@ -13,12 +13,16 @@
 .sly-img{
 	background-color: #CCC;
 	height: 400px;
+	position: relative;
 	margin-bottom: 10px;
 	width: 100%;
 }
 
 .sly-img img{
 	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
 	width: 100%;
 }
 
@@ -51,7 +55,7 @@
 }
 
 .sly-thumbs{
-	background-color: #222;	
+	background-color: #222;
 	height: 60px;
 	overflow: hidden;
 	position: relative;
@@ -75,6 +79,7 @@
 }
 
 .sly-thumbs img{
+	border: none;
 	height: 100%;
 	width: 100%;
 }

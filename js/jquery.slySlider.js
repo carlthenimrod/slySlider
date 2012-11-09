@@ -44,7 +44,7 @@
 		var that = this;
 
 		//empty element
-		$(this.el).empty();
+		$(this.el).empty().hide();
 
 		//render element
 		that.render();
@@ -60,11 +60,17 @@
 		//render default
 		that.renderDefault();
 
-		//render modules
-		that.renderImage(that.modules.img);
-		that.renderText(that.modules.txt);
-		that.renderControls(that.modules.ctrlPrev, that.modules.ctrlNext);
-		that.renderThumbs(that.modules.thumbs);
+		//render modules, when complete fade element in
+		$.when(
+			that.renderImage(that.modules.img),
+			that.renderText(that.modules.txt),
+			that.renderControls(that.modules.ctrlPrev, that.modules.ctrlNext),
+			that.renderThumbs(that.modules.thumbs)
+		).then(function(){
+
+			//fade in slideshow
+			$(that.el).fadeIn();
+		});
 	};
 
 	slySlider.prototype.renderDefault = function(){
@@ -84,41 +90,39 @@
 
 	slySlider.prototype.renderImage = function(module, src){
 
-		var that = this, img, imgSrc;
+		var that = this, img,
+			dfd = $.Deferred();
 
-		//if src is provided
-		if(src){
-			imgSrc = src;
-		}
-		else{
+		//if no src
+		if(!src){
 
 			//get src for image, if imgSrc isn't set, get first img
-			imgSrc = (that.config.imgSrc) ? that.config.imgSrc : $(that.linkList[0]).attr('href');
+			src = (that.config.imgSrc) ? that.config.imgSrc : $(that.linkList[0]).attr('href');
 		}
 
-		//create img element
-		img = document.createElement('img');
+		//preload image
+		that.preloadImages(src).done(function(){
 
-		//set src attribute
-		img.setAttribute('src', imgSrc);
+			img = $('<img/>', {
 
-		//onload, insert img
-		img.onload = function(){
+				'src' : src
+			});
 
-			//insert img
+			//insert image into module
 			$(module).html(img);
-		};
 
-		//onerror, alert
-		img.onerror = function(){
+			//resolve
+			dfd.resolve();
+		});
 
-			alert('Error: Failed to load image.');
-		};		
+		//return promise
+		return dfd.promise();	
 	};
 
 	slySlider.prototype.renderText = function(module, title){
 
-		var that = this, link, title;
+		var that = this, link, title,
+			dfd = $.Deferred();
 
 		//if no title
 		if(!title){
@@ -132,16 +136,30 @@
 
 		//insert title into module
 		$(module).html(title);
+
+		//resolve
+		dfd.resolve();
+
+		//return promise
+		return dfd.promise();
 	};
 
 	slySlider.prototype.renderControls = function(modPrev, modNext){
 
-		var that = this;
+		var that = this,
+			dfd = $.Deferred();
+
+		//resolve
+		dfd.resolve();
+
+		//return promise
+		return dfd.promise();			
 	};
 
 	slySlider.prototype.renderThumbs = function(module){
 
-		var that = this, i, l, ul, li;
+		var that = this, i, l, ul, li, src = [],
+			dfd = $.Deferred();
 
 		//create unordered list element
 		ul = $('<ul>');
@@ -157,13 +175,26 @@
 
 			//append list element to ul
 			ul.append(li);
+
+			//add to src array
+			src.push($(that.linkList[i]).find('img').attr('src'));
 		}
 
-		//insert list to module
-		$(module).html(ul);
+		//preload images
+		that.preloadImages(src).done(function(){
 
-		//set list's width
-		that.setListWidth(ul);
+			//insert list to module
+			$(module).html(ul);
+
+			//set list's width
+			that.setListWidth(ul);
+
+			//resolve
+			dfd.resolve();			
+		});
+
+		//return promise
+		return dfd.promise();
 	};
 
 	slySlider.prototype.events = function(){
@@ -316,6 +347,48 @@
 
 		$ul.css('width', w);
 	};
+
+	/**
+	 * Helper function for passing arrays of promises to $.when
+	 */
+	$.whenArray = function ( array ) {
+		return $.when.apply( this, array );
+	};
+
+
+	/**
+	 * Accepts a single image src or an array of image srcs.
+	 * @return Promise that resolves once images have loaded.
+	 */
+	slySlider.prototype.preloadImages = function(srcs) {
+		var dfd = $.Deferred(),
+			promises = [],
+			img,
+			l,
+			p;
+
+		if (!$.isArray(srcs)) {
+			srcs = [srcs];
+		}
+
+		l = srcs.length;
+
+		for (var i = 0; i < l; i++) {
+			p = $.Deferred();
+			img = $("<img />");
+
+			img.load(p.resolve);
+			img.error(p.resolve);
+
+			promises.push(p);
+
+			img.get(0).src = srcs[i];
+		}
+
+		$.whenArray(promises).done(dfd.resolve);
+
+		return dfd.promise();
+	}
 
 	$.fn.slySlider = function(options){
 
