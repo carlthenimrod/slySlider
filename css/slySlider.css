@@ -24,6 +24,11 @@
 	top: 0;
 	left: 0;
 	width: 100%;
+	z-index: 1;
+}
+
+.sly-img img.sly-active{
+	z-index: 2;
 }
 
 .sly-txt{
@@ -76,6 +81,14 @@
 	height: 100%;
 	margin-right: 5px;
 	width: 120px;
+}
+
+.sly-thumbs a{
+	opacity: .4;
+}
+
+.sly-thumbs a.sly-active-thumb, .sly-thumbs a:hover{
+	opacity: 1;
 }
 
 .sly-thumbs img{

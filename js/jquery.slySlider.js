@@ -6,6 +6,7 @@
 		classNames : {
 
 			active : 'sly-active',
+			activeThumb : 'sly-active-thumb',
 			ctn : 'sly-ctn',
 			ctrlPrev : 'sly-prev',
 			ctrlNext : 'sly-next',
@@ -88,17 +89,13 @@
 						.append(that.modules.thumbs);
 	};
 
-	slySlider.prototype.renderImage = function(module, src){
+	slySlider.prototype.renderImage = function(module){
 
-		var that = this, img,
+		var that = this, img, src,
 			dfd = $.Deferred();
 
-		//if no src
-		if(!src){
-
-			//get src for image, if imgSrc isn't set, get first img
-			src = (that.config.imgSrc) ? that.config.imgSrc : $(that.linkList[0]).attr('href');
-		}
+		//get src for image, if imgSrc isn't set, get first img
+		src = (that.config.imgSrc) ? that.config.imgSrc : $(that.linkList[0]).attr('href');
 
 		//preload image
 		that.preloadImages(src).done(function(){
@@ -108,8 +105,8 @@
 				'src' : src
 			});
 
-			//insert image into module
-			$(module).html(img);
+			//if not loaded insert and add active class
+			$(module).html(img.addClass(that.config.classNames.active));
 
 			//resolve
 			dfd.resolve();
@@ -119,20 +116,16 @@
 		return dfd.promise();	
 	};
 
-	slySlider.prototype.renderText = function(module, title){
+	slySlider.prototype.renderText = function(module){
 
 		var that = this, link, title,
 			dfd = $.Deferred();
 
-		//if no title
-		if(!title){
+		//find and store link
+		link = that.findLink(that.config.imgSrc);
 
-			//find and store link
-			link = that.findLink(that.config.imgSrc);
-
-			//store link's title
-			title = $(link).attr('title');
-		}
+		//store link's title
+		title = $(link).attr('title');
 
 		//insert title into module
 		$(module).html(title);
@@ -158,7 +151,7 @@
 
 	slySlider.prototype.renderThumbs = function(module){
 
-		var that = this, i, l, ul, li, src = [],
+		var that = this, i, l, ul, li, src = [], active,
 			dfd = $.Deferred();
 
 		//create unordered list element
@@ -188,6 +181,12 @@
 
 			//set list's width
 			that.setListWidth(ul);
+
+			//find active thumb
+			active = (that.config.imgSrc) ? that.findLink(imgSrc) : that.findLink();
+
+			//add active class
+			$(active).addClass(that.config.classNames.activeThumb);
 
 			//resolve
 			dfd.resolve();			
@@ -226,9 +225,17 @@
 
 		var that = this;
 
-		//render elements
-		that.renderImage(that.modules.img, $(link).attr('href'));
-		that.renderText(that.modules.txt, $(link).attr('title'));
+		//change active link
+		that.activeLink = link;
+
+		//remove active class from all thumbs
+		$('.' + that.config.classNames.thumbs + ' a').removeClass(that.config.classNames.activeThumb);
+
+		//add active class to selected thumb
+		$(link).addClass(that.config.classNames.activeThumb);
+
+		//transition
+		that.transition();
 	};
 
 	slySlider.prototype.eventThumbMouseMove = function(ctn, relX){
@@ -264,7 +271,55 @@
 
 		//move list
 		ul.css({ 'left' : '-' + move + 'px' });
-	};	
+	};
+
+	slySlider.prototype.transition = function(){
+
+		var that = this,
+			active = that.modules.img.find('img.sly-active')[0],
+			activeSrc = $(active).attr('src'),
+			$link = $(that.activeLink),
+			newSrc = $link.attr('href'),
+			title = $link.attr('title'),
+			img;
+
+		//if the activeSrc is not equal to the newSrc, proceed
+		if(activeSrc !== newSrc){
+
+			//if active element is not animating
+			if($('.' + that.config.classNames.active).not(':animated').length){
+
+				//preload images
+				that.preloadImages(newSrc).done(function(){
+
+					//create new image
+					img = $('<img/>', {
+
+						'src' : newSrc
+					});
+
+					//append image to image module
+					that.modules.img.append(img);
+
+					//fade out active image
+					$('.' + that.config.classNames.active).stop().fadeOut(1000, function(){
+
+						//remove after animation completion
+						$(this).remove();
+
+						//add active class to new image
+						img.addClass(that.config.classNames.active);
+
+						//add new title
+						that.modules.txt.html(title);
+
+						//transition again
+						that.transition();
+					});					
+				});	
+			}
+		}
+	};
 
 	slySlider.prototype.createModules = function(){
 
@@ -348,13 +403,6 @@
 		$ul.css('width', w);
 	};
 
-	/**
-	 * Helper function for passing arrays of promises to $.when
-	 */
-	$.whenArray = function ( array ) {
-		return $.when.apply( this, array );
-	};
-
 
 	/**
 	 * Accepts a single image src or an array of image srcs.
@@ -385,7 +433,7 @@
 			img.get(0).src = srcs[i];
 		}
 
-		$.whenArray(promises).done(dfd.resolve);
+		$.when.apply(this, promises).done(dfd.resolve);
 
 		return dfd.promise();
 	}
