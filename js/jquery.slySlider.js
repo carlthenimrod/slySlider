@@ -3,6 +3,8 @@
 	//create defaults
 	var defaults = {
 
+		autoStart : true,
+
 		classNames : {
 
 			active : 'sly-active',
@@ -17,7 +19,13 @@
 
 		imgSrc : false,
 
-		render : 'default'
+		render : 'default',
+
+		speed : {
+
+			load : 300,
+			transition : 500
+		}
 	};
 
 	function slySlider(el, options){
@@ -70,7 +78,11 @@
 		).then(function(){
 
 			//fade in slideshow
-			$(that.el).fadeIn();
+			$(that.el).fadeIn(that.config.speed.load);
+
+			if(that.config.autoStart){
+				
+			}
 		});
 	};
 
@@ -285,7 +297,7 @@
 
 		//if the activeSrc is not equal to the newSrc, proceed
 		if(activeSrc !== newSrc){
-			
+
 			//add new title
 			that.modules.txt.html(title);
 
@@ -305,7 +317,7 @@
 					that.modules.img.append(img);
 
 					//fade out active image
-					$('.' + that.config.classNames.active).stop().fadeOut(1000, function(){
+					$('.' + that.config.classNames.active).stop().fadeOut(that.config.speed.transition, function(){
 
 						//remove after animation completion
 						$(this).remove();
