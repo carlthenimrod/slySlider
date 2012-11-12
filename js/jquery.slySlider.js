@@ -285,6 +285,9 @@
 
 		//if the activeSrc is not equal to the newSrc, proceed
 		if(activeSrc !== newSrc){
+			
+			//add new title
+			that.modules.txt.html(title);
 
 			//if active element is not animating
 			if($('.' + that.config.classNames.active).not(':animated').length){
@@ -309,9 +312,6 @@
 
 						//add active class to new image
 						img.addClass(that.config.classNames.active);
-
-						//add new title
-						that.modules.txt.html(title);
 
 						//transition again
 						that.transition();
