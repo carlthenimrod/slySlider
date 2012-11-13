@@ -23,6 +23,7 @@
 
 		speed : {
 
+			auto : 5000,
 			load : 300,
 			transition : 500
 		}
@@ -59,7 +60,7 @@
 		that.render();
 
 		//create events
-		that.events();	
+		that.events();
 	};
 
 	slySlider.prototype.render = function(){
@@ -80,9 +81,8 @@
 			//fade in slideshow
 			$(that.el).fadeIn(that.config.speed.load);
 
-			if(that.config.autoStart){
-				
-			}
+			//if autoStart is enabled, start auto
+			if(that.config.autoStart) that.autoStart = win.setInterval(function(){ that.auto() }, that.config.speed.auto);
 		});
 	};
 
@@ -195,7 +195,7 @@
 			that.setListWidth(ul);
 
 			//find active thumb
-			active = (that.config.imgSrc) ? that.findLink(imgSrc) : that.findLink();
+			active = (that.config.imgSrc) ? that.findLink(that.config.imgSrc) : that.findLink();
 
 			//add active class
 			$(active).addClass(that.config.classNames.activeThumb);
@@ -293,10 +293,14 @@
 			$link = $(that.activeLink),
 			newSrc = $link.attr('href'),
 			title = $link.attr('title'),
+			timeout,
 			img;
 
 		//if the activeSrc is not equal to the newSrc, proceed
 		if(activeSrc !== newSrc){
+
+			//if autoStart is enabled, clear it
+			if(that.config.autoStart) win.clearInterval(that.autoStart);
 
 			//add new title
 			that.modules.txt.html(title);
@@ -323,9 +327,12 @@
 						$(this).remove();
 
 						//add active class to new image
-						img.addClass(that.config.classNames.active);
+						img.addClass(that.config.classNames.active);						
 
-						//transition again
+						//if autoStart is enabled, start auto
+						if(that.config.autoStart) that.autoStart = win.setInterval(function(){ that.auto() }, that.config.speed.auto);
+
+						//transition
 						that.transition();
 					});					
 				});	
@@ -373,6 +380,51 @@
 
 		//return modules object
 		return modules;
+	};
+
+	slySlider.prototype.auto = function(){
+
+		var that = this, active, $active, ul, li, lastLink, nextLink;
+
+		//if active link is set, else find active image
+		if(that.activeLink){
+
+			active = that.activeLink;
+		}
+		else{
+			//find active thumb
+			active = (that.config.imgSrc) ? that.findLink(that.config.imgSrc) : that.findLink();
+		}
+
+		//set active
+		$active = $(active);
+
+		//find list item
+		li = $active.parent();
+
+		//find ul
+		ul = li.parent();
+
+		//find nextLink
+		nextLink = li.next().find('a');
+
+		//find lastLink
+		lastLink = ul.find('li').last().find('a');
+
+		//find firstLink
+		firstLink = ul.find('li').first().find('a');
+
+		//activeLink equals first if nextLink and lastLink equal
+		that.activeLink = ($(that.activeLink).attr('href') === lastLink.attr('href')) ? firstLink : nextLink;
+
+		//remove active class from all thumbs
+		$('.' + that.config.classNames.thumbs + ' a').removeClass(that.config.classNames.activeThumb);
+
+		//add active class to selected thumb
+		$(that.activeLink).addClass(that.config.classNames.activeThumb);		
+
+		//transition
+		that.transition();
 	};
 
 	slySlider.prototype.findLink = function(href){
