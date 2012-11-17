@@ -20,6 +20,8 @@
 		imgSrc : false,
 
 		render : 'default',
+		resolution : 1.777,
+		responsive : false,
 
 		speed : {
 
@@ -54,10 +56,16 @@
 		var that = this;
 
 		//empty element
-		$(this.el).empty().hide();
+		$(this.el).empty();
 
 		//render element
 		that.render();
+
+		//settings
+		that.settings();		
+
+		//hide element
+		$(this.el).hide();
 
 		//create events
 		that.events();
@@ -208,6 +216,27 @@
 		return dfd.promise();
 	};
 
+	slySlider.prototype.settings = function(){
+
+		var that = this,
+			$img = $('.' + that.config.classNames.img);
+
+		//create settings object
+		that.settings = {};
+
+		//set width
+		that.settings.width = $img.width();
+
+		//set height
+		that.settings.height = (that.config.responsive) ? that.settings.width / that.config.resolution : $img.height();
+
+
+		console.log(that.settings.height);
+
+		//if responsive
+		if(that.config.responsive) $img.height(that.settings.height);
+	};
+
 	slySlider.prototype.events = function(){
 
 		var that = this;
@@ -230,7 +259,18 @@
 			e.preventDefault();
 		});
 
-		$(that.modules.img).on('click', '');	
+		$(that.modules.img).on('click', '');
+
+		//if responsive
+		if(that.config.responsive){
+
+			//on window resize
+			$(win).on('resize', function(){
+
+				//responsive resize
+				that.eventResponsiveResize();
+			});
+		}
 	};
 
 	slySlider.prototype.eventThumbClick = function(link){
@@ -283,6 +323,18 @@
 
 		//move list
 		ul.css({ 'left' : '-' + move + 'px' });
+	};
+
+	slySlider.prototype.eventResponsiveResize = function(){
+
+		var that = this,
+			$img = $('.' + that.config.classNames.img);	
+
+		that.settings.width = $img.width();
+		that.settings.height = that.settings.width / that.config.resolution;
+
+		//set img height
+		$img.height(that.settings.height);
 	};
 
 	slySlider.prototype.transition = function(){
