@@ -56,7 +56,7 @@
 		var that = this;
 
 		//empty element
-		$(this.el).empty();
+		$that.el).empty();
 
 		//render element
 		that.render();
@@ -65,7 +65,7 @@
 		that.settings();		
 
 		//hide element
-		$(this.el).hide();
+		$(that.el).hide();
 
 		//create events
 		that.events();
