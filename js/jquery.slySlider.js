@@ -56,7 +56,7 @@
 		var that = this;
 
 		//empty element
-		$that.el).empty();
+		$(that.el).empty();
 
 		//render element
 		that.render();
