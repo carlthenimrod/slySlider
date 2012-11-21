@@ -4,7 +4,7 @@
 }
 
 .sly-ctn{
-	background-color: #222;
+	background-color: #000;
 	padding: 10px;
 	position: relative;
 	width: 100%;
@@ -19,6 +19,7 @@
 }
 
 .sly-img img{
+	cursor: pointer;
 	height: 100%;
 	position: absolute;
 	top: 0;
@@ -42,21 +43,36 @@
 }
 
 .sly-prev{
-	height: 20px;
+	background: url(../img/sly-prev.png) center center no-repeat;
+	cursor: pointer;
+	height: 400px;
 	line-height: 20px;
 	position: absolute;
+	top: 0;
 	left: 0;
-	bottom: 0;
-	width: 20px;
+	width: 80px;
+	z-index: 3;
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
 }
 
 .sly-next{
-	height: 20px;
+	background: url(../img/sly-next.png) center center no-repeat;
+	cursor: pointer;
+	height: 400px;
 	line-height: 20px;
 	position: absolute;
+	position: absolute;
+	top: 0;
 	right: 0;
-	bottom: 0;
-	width: 20px;	
+	width: 80px;
+	z-index: 3;
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;	
 }
 
 .sly-thumbs{

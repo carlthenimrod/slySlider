@@ -102,10 +102,10 @@
 		$(this.el).append(that.modules.ctn);
 
 		//append elements to container
-		that.modules.ctn.append(that.modules.img)
-						.append(that.modules.txt)
-						.append(that.modules.ctrlPrev)
+		that.modules.ctn.append(that.modules.ctrlPrev)
 						.append(that.modules.ctrlNext)
+						.append(that.modules.img)
+						.append(that.modules.txt)
 						.append(that.modules.thumbs);
 	};
 
@@ -230,9 +230,6 @@
 		//set height
 		that.settings.height = (that.config.responsive) ? that.settings.width / that.config.resolution : $img.height();
 
-
-		console.log(that.settings.height);
-
 		//if responsive
 		if(that.config.responsive) $img.height(that.settings.height);
 	};
@@ -259,7 +256,34 @@
 			e.preventDefault();
 		});
 
-		$(that.modules.img).on('click', '');
+		$(that.modules.img).on('click', function(e){
+
+			//on img click
+			that.eventImgClick();
+
+			//prevent default
+			e.preventDefault();
+		});
+
+		//prev click
+		$(that.modules.ctrlPrev).on('click', function(e){
+
+			//prev control click
+			that.eventCtrlPrevClick();
+
+			//prevent default
+			e.preventDefault();			
+		});
+
+		//next click
+		$(that.modules.ctrlNext).on('click', function(e){
+
+			//next control click
+			that.eventCtrlNextClick();			
+
+			//prevent default
+			e.preventDefault();
+		});
 
 		//if responsive
 		if(that.config.responsive){
@@ -289,6 +313,105 @@
 		//transition
 		that.transition();
 	};
+
+	slySlider.prototype.eventImgClick = function(){
+
+		var that = this,
+			active = that.modules.img.find('img.sly-active')[0],
+			activeSrc = $(active).attr('src'),
+			thumb, link;
+
+		//store thumb
+		thumb = that.findLink(activeSrc);
+
+		//store link
+		link = $(thumb).find('img').attr('rel');
+
+		//go
+		win.location = link;
+	};
+
+	slySlider.prototype.eventCtrlPrevClick = function(){
+
+		var that = this,
+			active = that.modules.img.find('img.sly-active')[0],
+			activeSrc = $(active).attr('src'),
+			thumb, ul, li, firstLink, lastLink;
+
+		//store thumb
+		thumb = that.findLink(activeSrc);
+
+		//store li
+		li = $(thumb).parent();
+
+		//store ul
+		ul = li.parent();
+
+		//store firstLink
+		firstLink = ul.find('li').first();
+
+		//store lastLink
+		lastLink = ul.find('li').last();
+
+		//remove active thumbs class
+		ul.find('a').removeClass(that.config.classNames.activeThumb);
+
+		//first first link html matchs li html
+		if(firstLink.html() === li.html()){
+
+			//set activeLink to last link
+			that.activeLink = lastLink.find('a').addClass(that.config.classNames.activeThumb);
+		}
+		else{
+
+			//else previous
+			that.activeLink = li.prev().find('a').addClass(that.config.classNames.activeThumb);
+		}
+
+		//transition
+		that.transition();
+	};
+
+	slySlider.prototype.eventCtrlNextClick = function(){
+
+		var that = this,
+			active = that.modules.img.find('img.sly-active')[0],
+			activeSrc = $(active).attr('src'),
+			thumb, ul, li, firstLink, lastLink;
+
+		//store thumb
+		thumb = that.findLink(activeSrc);
+
+		//store li
+		li = $(thumb).parent();
+
+		//store ul
+		ul = li.parent();
+
+		//store firstLink
+		firstLink = ul.find('li').first();
+
+		//store lastLink
+		lastLink = ul.find('li').last();
+
+		//remove active thumbs class
+		ul.find('a').removeClass(that.config.classNames.activeThumb);
+
+		//first first link html matchs li html
+		if(lastLink.html() === li.html()){
+
+			//set activeLink to last link
+			that.activeLink = firstLink.find('a').addClass(that.config.classNames.activeThumb);
+		}
+		else{
+
+			//else previous
+			that.activeLink = li.next().find('a').addClass(that.config.classNames.activeThumb);
+		}
+
+		//transition
+		that.transition();
+	};	
 
 	slySlider.prototype.eventThumbMouseMove = function(ctn, relX){
 
@@ -478,6 +601,27 @@
 		//transition
 		that.transition();
 	};
+
+	slySlider.prototype.findThumb = function(src){
+
+		var that = this, i, l;
+
+
+		console.log(src);
+
+		//for each element in linkList
+		for(i = 0, l = that.linkList.length; i < l; ++i){
+		
+		console.log($(that.linkList[i]).find('img').attr('src'));
+
+			//if href matches current links href
+			if(src === $(that.linkList[i]).find('img').attr('src')){
+
+				//return link
+				return that.linkList[i];
+			}
+		}		
+	}
 
 	slySlider.prototype.findLink = function(href){
 
