@@ -12,7 +12,6 @@
 
 .sly-img{
 	background-color: #CCC;
-	height: 400px;
 	position: relative;
 	width: 100%;
 }
@@ -44,7 +43,6 @@
 .sly-prev{
 	background: url(../img/sly-prev.png) center center no-repeat;
 	cursor: pointer;
-	height: 400px;
 	line-height: 20px;
 	position: absolute;
 	top: 0;
@@ -60,7 +58,6 @@
 .sly-next{
 	background: url(../img/sly-next.png) center center no-repeat;
 	cursor: pointer;
-	height: 400px;
 	line-height: 20px;
 	position: absolute;
 	position: absolute;

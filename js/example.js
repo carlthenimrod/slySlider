@@ -2,5 +2,8 @@
 $(function(){
 
 	//activate slySlider
-	$('#element').slySlider();
+	$('#element').slySlider({
+
+		responsive : true
+	});
 });

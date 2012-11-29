@@ -219,7 +219,9 @@
 	slySlider.prototype.settings = function(){
 
 		var that = this,
-			$img = $('.' + that.config.classNames.img);
+			$img = $('.' + that.config.classNames.img),
+			$prev = $('.' + that.config.classNames.ctrlPrev),
+			$next = $('.' + that.config.classNames.ctrlNext);
 
 		//create settings object
 		that.settings = {};
@@ -231,7 +233,12 @@
 		that.settings.height = (that.config.responsive) ? that.settings.width / that.config.resolution : $img.height();
 
 		//if responsive
-		if(that.config.responsive) $img.height(that.settings.height);
+		if(that.config.responsive){
+			
+			$img.height(that.settings.height);
+			$prev.height(that.settings.height);
+			$next.height(that.settings.height);
+		}
 	};
 
 	slySlider.prototype.events = function(){
@@ -451,13 +458,17 @@
 	slySlider.prototype.eventResponsiveResize = function(){
 
 		var that = this,
-			$img = $('.' + that.config.classNames.img);	
+			$img = $('.' + that.config.classNames.img),
+			$prev = $('.' + that.config.classNames.ctrlPrev),
+			$next = $('.' + that.config.classNames.ctrlNext);	
 
 		that.settings.width = $img.width();
 		that.settings.height = that.settings.width / that.config.resolution;
 
 		//set img height
 		$img.height(that.settings.height);
+		$prev.height(that.settings.height);
+		$next.height(that.settings.height);
 	};
 
 	slySlider.prototype.transition = function(){
@@ -606,13 +617,8 @@
 
 		var that = this, i, l;
 
-
-		console.log(src);
-
 		//for each element in linkList
 		for(i = 0, l = that.linkList.length; i < l; ++i){
-		
-		console.log($(that.linkList[i]).find('img').attr('src'));
 
 			//if href matches current links href
 			if(src === $(that.linkList[i]).find('img').attr('src')){
