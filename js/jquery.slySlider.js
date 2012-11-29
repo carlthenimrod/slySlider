@@ -56,16 +56,13 @@
 		var that = this;
 
 		//empty element
-		$(that.el).empty();
-
-		//render element
-		that.render();
-
-		//settings
-		that.settings();		
+		$(that.el).empty();		
 
 		//hide element
 		$(that.el).hide();
+
+		//render element
+		that.render();
 
 		//create events
 		that.events();
@@ -85,6 +82,15 @@
 			that.renderControls(that.modules.ctrlPrev, that.modules.ctrlNext),
 			that.renderThumbs(that.modules.thumbs)
 		).then(function(){
+
+			//show element
+			$(that.el).show();			
+
+			//settings
+			that.settings();		
+
+			//hide element
+			$(that.el).hide();
 
 			//fade in slideshow
 			$(that.el).fadeIn(that.config.speed.load);
@@ -234,7 +240,7 @@
 
 		//if responsive
 		if(that.config.responsive){
-			
+
 			$img.height(that.settings.height);
 			$prev.height(that.settings.height);
 			$next.height(that.settings.height);
