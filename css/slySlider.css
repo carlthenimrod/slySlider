@@ -84,7 +84,7 @@
 	list-style-type: none;
 	margin: 0;
 	padding: 0;
-	position: relative;
+	position: absolute;
 	left: 0;
 }
 
